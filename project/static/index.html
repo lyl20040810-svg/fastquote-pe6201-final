@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FastQuote</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">FastQuote</div>
+      <div class="subtitle">Fastener quotation workspace</div>
+    </div>
+    <div class="mode-control" role="group" aria-label="Extraction mode">
+      <button class="mode active" data-mode="auto">Auto</button>
+      <button class="mode" data-mode="rules">Rules</button>
+      <button class="mode" data-mode="openrouter">OpenRouter</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="request-layout">
+      <section class="request-band">
+        <label for="request">Customer request</label>
+        <textarea id="request" rows="4" spellcheck="true">Please quote M16x50, 2 cartons.</textarea>
+        <div class="request-actions">
+          <div class="examples">
+            <button class="text-button" data-example="Please quote M16x50, 2 cartons.">Normal quote</button>
+            <button class="text-button" data-example="Please quote M16x50, 18 pieces.">Approval case</button>
+            <button class="text-button" data-example="Need M16 bolts, 3 boxes.">Missing length</button>
+          </div>
+          <button id="generate" class="primary">Generate quotation</button>
+        </div>
+      </section>
+      <div class="bolt-visual" aria-hidden="true"><img src="hex-bolt.png" alt=""></div>
+    </div>
+
+    <div id="notice" class="notice hidden" role="status"></div>
+
+    <section id="results" class="results hidden">
+      <div class="section-head">
+        <h1>Quotation review</h1>
+        <span id="status" class="status"></span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="metric"><span>Product</span><strong id="sku">-</strong></div>
+        <div class="metric"><span>Total pieces</span><strong id="pieces">-</strong></div>
+        <div class="metric"><span>Discount</span><strong id="discount">-</strong></div>
+        <div class="metric"><span>Quoted total</span><strong id="revenue">-</strong></div>
+        <div class="metric"><span>Gross margin</span><strong id="margin">-</strong></div>
+        <div class="metric"><span>Need Approval</span><strong id="approval">-</strong></div>
+      </div>
+
+      <div class="detail-grid">
+        <section class="panel">
+          <h2>Verified inputs</h2>
+          <dl id="verified-inputs"></dl>
+        </section>
+        <section class="panel">
+          <h2>Calculation trace</h2>
+          <dl id="calculation"></dl>
+        </section>
+      </div>
+
+      <section class="reply-panel">
+        <div class="reply-head">
+          <h2>Customer reply draft</h2>
+          <button id="copy" class="icon-button" title="Copy reply" aria-label="Copy reply">Copy</button>
+        </div>
+        <p id="reply"></p>
+      </section>
+
+      <p class="review-note">Human review is required before the quotation is sent.</p>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
+

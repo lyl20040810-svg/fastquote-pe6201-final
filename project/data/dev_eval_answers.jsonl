@@ -1,0 +1,17 @@
+{"id":"DEV-001","expected_processing_status":"quoted","standard":"DIN933","diameter":"M16","length_mm":50,"quantity":2,"unit":"carton","approval_status":"normal"}
+{"id":"DEV-002","expected_processing_status":"quoted","standard":"DIN933","diameter":"M16","length_mm":80,"quantity":5,"unit":"box","approval_status":"normal"}
+{"id":"DEV-003","expected_processing_status":"quoted","standard":"DIN933","diameter":"M20","length_mm":80,"quantity":5,"unit":"carton","approval_status":"normal"}
+{"id":"DEV-004","expected_processing_status":"quoted","standard":"DIN933","diameter":"M22","length_mm":120,"quantity":10,"unit":"carton","approval_status":"normal"}
+{"id":"DEV-005","expected_processing_status":"quoted","standard":"DIN933","diameter":"M24","length_mm":60,"quantity":1,"unit":"box","approval_status":"normal"}
+{"id":"DEV-006","expected_processing_status":"quoted","standard":"DIN933","diameter":"M27","length_mm":100,"quantity":20,"unit":"piece","approval_status":"normal"}
+{"id":"DEV-007","expected_processing_status":"quoted","standard":"DIN933","diameter":"M30","length_mm":120,"quantity":10,"unit":"carton","approval_status":"normal"}
+{"id":"DEV-008","expected_processing_status":"quoted","standard":"DIN933","diameter":"M14","length_mm":160,"quantity":2,"unit":"box","approval_status":"normal"}
+{"id":"DEV-009","expected_processing_status":"quoted","standard":"DIN933","diameter":"M33","length_mm":100,"quantity":100,"unit":"piece","approval_status":"normal"}
+{"id":"DEV-010","expected_processing_status":"quoted","standard":"DIN933","diameter":"M16","length_mm":25,"quantity":1,"unit":"carton","approval_status":"normal"}
+{"id":"DEV-011","expected_processing_status":"flagged","flag_reason":"ambiguous_or_incomplete"}
+{"id":"DEV-012","expected_processing_status":"flagged","flag_reason":"ambiguous_or_incomplete"}
+{"id":"DEV-013","expected_processing_status":"flagged","flag_reason":"ambiguous_or_incomplete"}
+{"id":"DEV-014","expected_processing_status":"flagged","flag_reason":"no_exact_catalog_match"}
+{"id":"DEV-015","expected_processing_status":"flagged","flag_reason":"no_exact_catalog_match"}
+{"id":"DEV-016","expected_processing_status":"quoted","standard":"DIN933","diameter":"M16","length_mm":50,"quantity":18,"unit":"piece","approval_status":"manager_approval"}
+
