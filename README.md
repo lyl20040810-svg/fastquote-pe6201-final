@@ -1,0 +1,99 @@
+# FastQuote | PE6201 final code and evaluation package
+
+FastQuote is a quotation-preparation assistant for a fastener sales representative. It turns a customer's informal request into a structured product/quantity extraction, looks up an exact row in a verified price-list subset, calculates a quote with deterministic Python rules, and produces a customer-reply draft for human review. It does not place orders, approve exceptions, or send messages.
+
+## What to open first
+
+| Need | File |
+| --- | --- |
+| Run the self-contained Colab demo | `notebooks/FastQuote_Colab.ipynb` |
+| Run locally or inspect the code | `project/` |
+| Understand the data and its limits | `data/README.md` |
+| Reproduce and interpret the evaluation | `evals/README.md` and `docs/METRICS.md` |
+| Check release integrity | `SHA256SUMS.txt` and `FREEZE.md` |
+
+## User, input, and output
+
+**Persona:** A salesperson receiving customer requests for DIN933 A2 external hex bolts. The customer does not need to know the internal standard or material code.
+
+**Input:** Free text containing a diameter and length (for example `M16x50`) plus a quantity in pieces, boxes, or cartons (for example `2 cartons` or `2箱`). Requests with missing or uncertain details, multiple possible lengths, or unsupported specifications are held for human review.
+
+**Output:** An exact catalog match, packaging conversion, price-list and cost trace, discount, quote total, gross margin, manager-approval requirement, and an English customer-reply draft. Every quote requires salesperson confirmation. A manager-approval flag does **not** mean approval was granted.
+
+## Product architecture
+
+```text
+Customer request (web UI or evaluation input)
+            |
+            v
+OpenRouter LLM structured extraction  OR  deterministic Rules mode
+            |                         [LLM never computes money]
+            v
+Ambiguity/unit guardrails -> exact 73-row catalog lookup
+            |                    | no exact match / unclear
+            |                    +------------------------> manual review flag
+            v
+Deterministic packaging + pricing + margin calculation
+            |
+            v
+Manager-approval gate + controlled reply-template validation/fallback
+            |
+            v
+Reviewable page/API result -> salesperson review -> optional manager approval
+```
+
+The rented external intelligence is OpenRouter (`openai/gpt-4.1-mini` in the recorded run). Python owns the catalog, unit conversion, all arithmetic, approval threshold, and the final price inserted into the reply. Rules mode is an explicit non-LLM comparison/fallback, not the mode used for the recorded final evaluation.
+
+## Run in Colab
+
+From the published repository, [open the FastQuote demo notebook in Colab](https://colab.research.google.com/github/lyl20040810-svg/fastquote-pe6201/blob/main/notebooks/FastQuote_Colab.ipynb). Alternatively upload `notebooks/FastQuote_Colab.ipynb` from this ZIP.
+
+1. Open the notebook in Google Colab.
+2. In Colab **Secrets**, create `OPENROUTER_API_KEY` and enable notebook access. Do not put the key in a cell or this repository.
+3. Choose **Runtime > Run all**. The notebook builds the project from readable cells, runs unit tests, starts the local server, and displays a page/link in its final cell.
+4. Select **OpenRouter** in the page to force an API-backed request. **Auto** uses OpenRouter if the secret was loaded; **Rules** does not use the API.
+
+The Colab port link belongs to the runner's active session; it is not a permanent public URL. If the new-tab link is blocked, use the embedded page. The decorative bolt image may be omitted if its optional download is unavailable; quoting still works.
+
+## Run locally
+
+Python 3.10+ is sufficient for the app and tests; no pip installation is required.
+
+```powershell
+cd project
+python -m unittest discover -s tests -v
+python run_app.py
+```
+
+Open `http://127.0.0.1:8765/`. To use OpenRouter locally, copy `project/.env.example` to `project/.env`, set `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`, and keep `.env` private. The packaged directory contains no key. Example requests: `Please quote M16x50, 2 cartons.` and `Please quote M16x50, 18 pieces.`
+
+## Pricing policy used by this frozen build
+
+The catalog price is CNY per 1,000 pieces. Goods cost is `list price x 0.4 x pieces / 1,000`. Base selling price is `list price x 0.5`. Discounts depend on carton-equivalent quantity: 3% from 1 carton, 5% from 5 cartons, 10% from 10 cartons, and 0% below 1 carton. Add CNY 5 to cost only when an order is **smaller** than one complete box. Gross margin is `(revenue - total cost) / revenue`; below 10% requires manager approval. Displayed money is rounded to two decimals, half-up; margin decisions use unrounded values.
+
+## Code map
+
+| File/module | Responsibility |
+| --- | --- |
+| `project/run_app.py`, `project/static/` | Local HTTP API and glassmorphism web interface. |
+| `project/fastquote/catalog.py` | Loads and indexes verified SKU rows for exact lookup. |
+| `project/fastquote/extractor.py` | Rules and OpenRouter extraction; structured response and ambiguity/unit guards. |
+| `project/fastquote/pricing.py` | Decimal-based packaging, discount, cost, revenue, and margin logic. |
+| `project/fastquote/service.py` | Orchestrates extraction, catalog matching, quote/flag, approval, and controlled customer reply. |
+| `project/fastquote/evaluation.py`, `project/run_eval.py` | Case-level evaluation and reproducible metadata. |
+| `project/tests/` | Pricing, workflow, evaluator, and post-baseline guardrail regression tests. |
+
+Python modules include file-level docstrings and deliberately keep extraction separate from deterministic money logic. No customer request or result is persisted by the app itself.
+
+## Evaluation snapshot
+
+The original proposal targeted at least 50 cases and at least 90% fully correct end-to-end quotations. The first OpenRouter run scored **42/50 (84%)** on the strict structured-workflow metric. After reviewing those failures and changing the code, the second run scored **45/50 (90%)**. The remaining five cases were safely flagged, but with `ambiguous_or_incomplete` rather than the gold label `no_exact_catalog_match`. See `docs/METRICS.md` for denominators, the disaggregated metrics, and limitations. The second run is a **post-feedback regression**, not a fresh blind result.
+
+## Boundaries and submission notes
+
+- The catalog is a **73-row verified subset**, not the complete company price list. Unsupported SKUs must not be priced by interpolation.
+- The price data is real and is included here with the project owner's permission. Treat it accordingly before further redistribution.
+- Source photographs were supplied during development but are not available as local files in this package; the transcribed JSON and readable Excel are included and carry source-page fields where available.
+- Customer-reply drafts still require human review. No ERP/CRM, inventory, automatic sending, or real manager approval is implemented.
+- Manual-versus-assisted preparation time and live sales outcomes were **not** measured. The evaluation concerns this 50-case test set only.
+- The final report PDF and narrated video are separate course artifacts; they are not represented by this code/evaluation package.
